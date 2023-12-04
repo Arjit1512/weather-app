@@ -9,8 +9,7 @@ const api = {
   base: "https://api.openweathermap.org/data/2.5/",
 };
 
-const deleteApi = "https://jsonplaceholder.typicode.com/posts"; // Replace with your actual delete endpoint
-const backendApi = "http://localhost:3001/api/cities"; // Replace with your actual backend endpoint
+const backendApi = "https://weather-app-backend-xi.vercel.app/api/cities";
 
 function App() {
   const [search, setSearch] = useState("");

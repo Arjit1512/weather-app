@@ -4,7 +4,15 @@ import cors from "cors";
 const app = express();
 const port = 3001; // or any other port you prefer
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://weather-app-mu-bay.vercel.app',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Connect to MongoDB (replace 'your_mongodb_connection_string' with your actual MongoDB connection string)
