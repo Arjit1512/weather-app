@@ -10,6 +10,7 @@ const api = {
 };
 
 const deleteApi = "https://jsonplaceholder.typicode.com/posts"; // Replace with your actual delete endpoint
+const backendApi = "http://localhost:3001/api/cities"; // Replace with your actual backend endpoint
 
 function App() {
   const [search, setSearch] = useState("");
@@ -28,30 +29,57 @@ function App() {
     axios.get(`${api.base}weather?q=${search}&units=metric&APPID=${api.key}`)
       .then((response) => {
         const newWeatherData = response.data;
-
-        // Save new city to cityList
-        setCityList((prevCityList) => [...prevCityList, newWeatherData]);
-
-        // Save updated cityList to localStorage
-        localStorage.setItem('cityList', JSON.stringify(cityList));
+  
+        // Check if the required properties exist before accessing them
+        if (newWeatherData && newWeatherData.main && newWeatherData.main.temp && newWeatherData.weather && newWeatherData.weather[0]) {
+          // Save new city to MongoDB
+          axios.post(`${backendApi}`, {
+            name: newWeatherData.name,
+            temperature: newWeatherData.main.temp,
+            condition: newWeatherData.weather[0].main,
+            description: newWeatherData.weather[0].description,
+          }).then(() => {
+            // Fetch the updated city list from MongoDB
+            axios.get(`${backendApi}`)
+              .then((response) => {
+                setCityList(response.data);
+                localStorage.setItem('cityList', JSON.stringify(response.data));
+              })
+              .catch((error) => {
+                console.error("Error fetching city list:", error);
+              });
+          })
+          .catch((error) => {
+            console.error("Error saving city to MongoDB:", error);
+          });
+        } else {
+          console.error("Invalid data format from OpenWeatherMap API");
+        }
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   };
-
+  
   const deleteCity = (id, index) => {
-    // Simulate delete request using axios.delete
-    axios.delete(`${deleteApi}/${id}`)
+    console.log("Deleting city with ID:", id);
+    axios.delete(`${backendApi}/${id}`)
       .then(() => {
-        const updatedCityList = cityList.filter((_, i) => i !== index);
-        setCityList(updatedCityList);
-        localStorage.setItem('cityList', JSON.stringify(updatedCityList));
+        // Fetch the updated city list from MongoDB
+        axios.get(`${backendApi}`)
+          .then((response) => {
+            setCityList(response.data);
+            localStorage.setItem('cityList', JSON.stringify(response.data));
+          })
+          .catch((error) => {
+            console.error("Error fetching city list:", error);
+          });
       })
       .catch((error) => {
         console.error("Error deleting city:", error);
       });
   };
+   
 
   return (
     <div className="App">
@@ -68,27 +96,37 @@ function App() {
       </div>
 
       {cityList.length > 0 && (
-        <div className="weather-cards-container">
-          {cityList.map((city, index) => (
-            <div key={index} className="weather-card">
-              {/* Location */}
-              <p>Location: {city.name}</p>
+  <div className="weather-cards-container">
+    {cityList.map((city, index) => (
+      <div key={index} className="weather-card">
+  {/* Location */}
+  <p>Location: {city.name}</p>
 
-              {/* Temperature Celsius */}
-              <p>Temperature: {city.main.temp}°C</p>
+  {/* Temperature Celsius */}
+  {city.temperature && (
+    <p>Temperature: {city.temperature}°C</p>
+  )}
 
-              {/* Condition (Sunny ) */}
-              <p>Condition: {city.weather[0].main}</p>
-              <p>Description: {city.weather[0].description}</p>
+  {/* Condition (Sunny ) */}
+  {city.condition && (
+    <div>
+      <p>Condition: {city.condition}</p>
+      <p>Description: {city.description}</p>
+    </div>
+  )}
 
-              {/* Delete button with dustbin icon */}
-              <button className="delete-btn" onClick={() => deleteCity(city.id, index)}>
-                <FontAwesomeIcon icon={faTrashAlt} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+  {/* Delete button with dustbin icon */}
+  <button className="delete-btn" onClick={() => deleteCity(city._id, index)}>
+    <FontAwesomeIcon icon={faTrashAlt} />
+  </button>
+</div>
+
+    ))}
+  </div>
+)}
+    
+
+    
     </div>
   );
 }
