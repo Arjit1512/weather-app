@@ -8,13 +8,13 @@ const port = 3001; // or any other port you prefer
 //app.use(cors());
 const allowedOrigins = [
   "https://weather-app-mu-bay.vercel.app",
-  "http://localhost:3001",
+  "http://localhost:3000",
 ];
 const app = express();
 app.use(cors({
   origin: allowedOrigins,
   methods: ["POST", "GET","DELETE"],
-  credentials: true
+  credentials:true
 }));
 
 

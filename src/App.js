@@ -9,7 +9,7 @@ const api = {
   base: "https://api.openweathermap.org/data/2.5/",
 };
 
-const backendApi = "https://weather-app-backend-xi.vercel.app";
+const backendApi = "https://weather-app-backend-xi.vercel.app/api/cities";
 
 function App() {
   const [search, setSearch] = useState("");
