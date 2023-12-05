@@ -1,17 +1,22 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-const app = express();
 const port = 3001; // or any other port you prefer
 
-const corsOptions = {
-  origin: 'https://weather-app-mu-bay.vercel.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204,
-};
 
-app.use(cors(corsOptions));
+//const app = express();
+//app.use(cors());
+const allowedOrigins = [
+  "https://weather-app-mu-bay.vercel.app",
+  "http://localhost:3001",
+];
+const app = express();
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["POST", "GET","DELETE"],
+  credentials: true
+}));
+
 
 app.use(express.json());
 

@@ -9,19 +9,18 @@ const api = {
   base: "https://api.openweathermap.org/data/2.5/",
 };
 
-const backendApi = "https://weather-app-backend-xi.vercel.app/api/cities";
+const backendApi = "https://weather-app-backend-arjits-projects-48c7f67d.vercel.app";
 
 function App() {
   const [search, setSearch] = useState("");
   const [weather, setWeather] = useState({});
   const [cityList, setCityList] = useState([]);
-
-  // Load city list from localStorage on component mount
   useEffect(() => {
     const savedCityList = localStorage.getItem('cityList');
     if (savedCityList) {
       setCityList(JSON.parse(savedCityList));
     }
+    
   }, []);
 
   const searchPressed = () => {
